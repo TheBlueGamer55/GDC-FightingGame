@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<workingSetManager>
-<workingSet editPageId="org.eclipse.jdt.ui.JavaWorkingSetPage" factoryID="org.eclipse.ui.internal.WorkingSetFactory" id="1423117135785_1" label="projects" name="projects">
-<item elementID="=projects" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=gdc-fighting-game-core" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=gdc-fighting-game-desktop" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-</workingSet>
-<workingSet aggregate="true" factoryID="org.eclipse.ui.internal.WorkingSetFactory" id="1423117024066_0" label="Window Working Set" name="Aggregate for window 1423117024066"/>
-</workingSetManager>

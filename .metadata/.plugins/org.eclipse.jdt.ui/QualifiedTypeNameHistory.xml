@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<qualifiedTypeNameHistroy>
-<fullyQualifiedTypeName name="com.mygdx.gdcfightinggame.SwordFightingGame"/>
-<fullyQualifiedTypeName name="com.badlogic.gdx.Gdx"/>
-<fullyQualifiedTypeName name="com.badlogic.gdx.Input.Keys"/>
-<fullyQualifiedTypeName name="org.mini2Dx.core.screen.transition.FadeOutTransition"/>
-<fullyQualifiedTypeName name="org.mini2Dx.core.screen.transition.FadeInTransition"/>
-</qualifiedTypeNameHistroy>

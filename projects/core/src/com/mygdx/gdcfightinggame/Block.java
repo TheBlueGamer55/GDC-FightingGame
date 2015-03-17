@@ -25,7 +25,8 @@ public class Block extends Rectangle{
 	public final float maxSpeedY = 6.0f;
 
 	public boolean isActive;
-	private Gameplay level;
+	protected Gameplay level;
+	public String type;
 
 	public Block(float x, float y, float width, float height, Gameplay level){
 		super(x, y, width, height);
@@ -35,6 +36,7 @@ public class Block extends Rectangle{
 		accelY = 0;
 		isActive = true;
 		this.level = level;
+		type = "Block";
 	}
 
 	public void render(Graphics g){
@@ -56,17 +58,22 @@ public class Block extends Rectangle{
 	}
 
 	/*
-	 * Move horizontally in the direction of the x-velocity vector. If there is a collision in
-	 * this direction, step pixel by pixel up until the block hits the solid.
+	 * Move horizontally in the direction of the x-velocity vector.
 	 */
 	public void moveX(){
 		for(int i = 0; i < level.solids.size(); i++){
 			Block solid = level.solids.get(i);
-			if(isColliding(solid, x + velX, y) && solid != this){
-				while(!isColliding(solid, x + Math.signum(velX), y)){
-					x += Math.signum(velX);
+			if(solid != this && isColliding(solid, x, y)){
+				if(solid.type.equals("Projectile") && this.type.equals("Projectile")){
+					level.solids.remove(this);
+					level.solids.remove(solid);
+					break;
 				}
-				velX = 0;
+				else if(solid.type.equals("Hitbox") && !this.type.equals("Projectile")){
+					while(!isColliding(solid, x + Math.signum(velX), y)){
+						x += Math.signum(velX);
+					}
+				}
 			}
 		}
 		x += velX;
@@ -74,17 +81,22 @@ public class Block extends Rectangle{
 	}
 
 	/*
-	 * Move vertically in the direction of the y-velocity vector. If there is a collision in
-	 * this direction, step pixel by pixel up until the block hits the solid.
+	 * Move vertically in the direction of the y-velocity vector.
 	 */
 	public void moveY(){
 		for(int i = 0; i < level.solids.size(); i++){
 			Block solid = level.solids.get(i);
-			if(isColliding(solid, x, y + velY) && solid != this){
-				while(!isColliding(solid, x, y + Math.signum(velY))){
-					y += Math.signum(velY);
+			if(solid != this && isColliding(solid, x, y)){
+				if(solid.type.equals("Projectile") && this.type.equals("Projectile")){
+					level.solids.remove(this);
+					level.solids.remove(solid);
+					break;
 				}
-				velY = 0;
+				else if(solid.type.equals("Hitbox") && !this.type.equals("Projectile")){
+					while(!isColliding(solid, x, y + Math.signum(velY))){
+						y += Math.signum(velY);
+					}
+				}
 			}
 		}
 		y += velY;
@@ -94,7 +106,7 @@ public class Block extends Rectangle{
 	/*
 	 * Limits the speed of the block to a set maximum
 	 */
-	private void limitSpeed(boolean horizontal, boolean vertical){
+	protected void limitSpeed(boolean horizontal, boolean vertical){
 		//If horizontal speed should be limited
 		if(horizontal){
 			if(Math.abs(velX) > maxSpeedX){
@@ -112,7 +124,10 @@ public class Block extends Rectangle{
 	/*
 	 * Checks if there is a collision if the block was at the given position.
 	 */
-	public boolean isColliding(Rectangle other, float x, float y){
+	public boolean isColliding(Block other, float x, float y){
+		if(other == this){ //Make sure this block isn't stuck on itself
+			return false;
+		}
 		if(x < other.x + other.width && x + width > other.x && y < other.y + other.height && y + height > other.y){
 			return true;
 		}
@@ -124,7 +139,7 @@ public class Block extends Rectangle{
 	 */
 	public boolean collisionExistsAt(float x, float y){
 		for(int i = 0; i < level.solids.size(); i++){
-			Rectangle solid = level.solids.get(i);
+			Block solid = level.solids.get(i);
 			if(solid != this && isColliding(solid, x, y)){
 				return true;
 			}

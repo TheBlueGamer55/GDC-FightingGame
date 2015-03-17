@@ -48,7 +48,12 @@ public class Gameplay implements GameScreen{
 	public void preTransitionIn(Transition t){
 		solids = new ArrayList<Block>();
 		solids.add(new Block(0, 400, 640, 16, this)); //TODO test code to spawn a platform for player testing
-		don = new Player(320, 32, this);
+		don = new Player(240, 360, this, Keys.A, Keys.D, Keys.W, Keys.Q, Keys.E);
+		knight = new Player(320, 360, this, Keys.J, Keys.L, Keys.I, Keys.U, Keys.O);
+		knight.facingRight = false;
+		knight.facingLeft = true;
+		solids.add(don.hitbox);
+		solids.add(knight.hitbox);
 	}
 
 	@Override
@@ -59,14 +64,16 @@ public class Gameplay implements GameScreen{
 	@Override
 	public void render(GameContainer gc, Graphics g){
 		g.drawString("Gameplay menu", 320, 240);
-		don.render(g);
 		renderSolids(g);
+		don.render(g);
+		knight.render(g);
 	}
 
 	@Override
 	public void update(GameContainer gc, ScreenManager<? extends GameScreen> sm, float delta){
-		don.update(delta);
 		updateSolids(delta);
+		don.update(delta);
+		knight.update(delta);
 		
 		if(Gdx.input.isKeyJustPressed(Keys.ESCAPE)){
 			sm.enterGameScreen(MainMenu.ID, new FadeOutTransition(), new FadeInTransition());

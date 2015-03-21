@@ -47,7 +47,7 @@ public class Gameplay implements GameScreen{
 	@Override
 	public void preTransitionIn(Transition t){
 		solids = new ArrayList<Block>();
-		solids.add(new Block(0, 400, 640, 16, this)); //TODO test code to spawn a platform for player testing
+		solids.add(new Block(0, 400, 0, 0, 0, 0, 640, 16, this)); //TODO test code to spawn a platform for player testing
 		don = new Player(240, 360, this, Keys.A, Keys.D, Keys.W, Keys.Q, Keys.E);
 		knight = new Player(320, 360, this, Keys.J, Keys.L, Keys.I, Keys.U, Keys.O);
 		knight.facingRight = false;

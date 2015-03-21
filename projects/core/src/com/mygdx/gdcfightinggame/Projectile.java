@@ -14,8 +14,9 @@ public class Projectile extends Block{
 	
 	public Player parent;
 
-	public Projectile(float x, float y, float width, float height, Gameplay level) {
-		super(x, y, width, height, level);
+	public Projectile(float x, float y, float velX, float velY, float accelX, float accelY, float width, float height, Gameplay level, Player parent) {
+		super(x, y, velX, velY, accelX, accelY, width, height, level);
+		this.parent = parent;
 		//TODO make sure this is everything we need for the constructor
 		this.type = "Projectile";
 		timer = 0.0f;
@@ -40,7 +41,7 @@ public class Projectile extends Block{
 				level.solids.remove(this);
 			}
 			
-			this.setX(x);
+			this.setX(x);//why is this necessary?
 			this.setY(y);
 		}
 	}

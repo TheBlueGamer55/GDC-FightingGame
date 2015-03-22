@@ -49,8 +49,8 @@ public class Gameplay implements GameScreen{
 	public void preTransitionIn(Transition t){
 		solids = new ArrayList<Block>();
 		solids.add(new Block(0, 400, 0, 0, 0, 0, 640, 16, this)); //TODO test code to spawn a platform for player testing
-		don = new Player(240, 320, this, Keys.A, Keys.D, Keys.W, Keys.Q, Keys.E);
-		knight = new Player(320, 320, this, Keys.J, Keys.L, Keys.I, Keys.U, Keys.O);
+		don = new Player(240, 320, 1, this, Keys.A, Keys.D, Keys.W, Keys.Q, Keys.E);
+		knight = new Player(320, 320, 2, this, Keys.J, Keys.L, Keys.I, Keys.U, Keys.O);
 		knight.facingRight = false;
 		knight.facingLeft = true;
 		solids.add(don.hitbox);

@@ -80,7 +80,7 @@ public class Player{ //TODO refactor/organize code so that each character should
 	protected int ATTACK1 = Keys.Q;
 	protected int ATTACK2 = Keys.E;
 
-	public Player(float x, float y, Gameplay level, int left, int right, int jump, int attack1, int attack2){
+	public Player(float x, float y, int playerID, Gameplay level, int left, int right, int jump, int attack1, int attack2){
 		this.x = x;
 		this.y = y;
 		hitbox = new Block(x, y, 0, 0, 0, 0, 32, 32, level); //TODO add sprite dimensions later
@@ -109,6 +109,15 @@ public class Player{ //TODO refactor/organize code so that each character should
 		s2.setScale(2);
 		current = s;
 		hitbox.setSize(16 * s.getScaleX(), s.getHeight() * s.getScaleY());
+		
+		if( playerID == 1 ){
+			
+			healthBarX = 50;
+
+		}
+		else if( playerID == 2){
+			healthBarX = Gdx.graphics.getWidth() - (healthBarMaxWidth + 50);
+		}
 	}
 
 	public void render(Graphics g){

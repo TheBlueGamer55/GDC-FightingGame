@@ -12,6 +12,7 @@ import org.mini2Dx.core.screen.transition.FadeOutTransition;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.graphics.Color;
 
 public class Gameplay implements GameScreen{
 
@@ -48,8 +49,8 @@ public class Gameplay implements GameScreen{
 	public void preTransitionIn(Transition t){
 		solids = new ArrayList<Block>();
 		solids.add(new Block(0, 400, 640, 16, this)); //TODO test code to spawn a platform for player testing
-		don = new Player(240, 360, this, Keys.A, Keys.D, Keys.W, Keys.Q, Keys.E);
-		knight = new Player(320, 360, this, Keys.J, Keys.L, Keys.I, Keys.U, Keys.O);
+		don = new Player(240, 320, this, Keys.A, Keys.D, Keys.W, Keys.Q, Keys.E);
+		knight = new Player(320, 320, this, Keys.J, Keys.L, Keys.I, Keys.U, Keys.O);
 		knight.facingRight = false;
 		knight.facingLeft = true;
 		solids.add(don.hitbox);
@@ -63,8 +64,10 @@ public class Gameplay implements GameScreen{
 
 	@Override
 	public void render(GameContainer gc, Graphics g){
+		g.setBackgroundColor(Color.LIGHT_GRAY);
 		g.drawString("Gameplay menu", 320, 240);
-		renderSolids(g);
+		renderSolids(g); //TODO may not be needed later on
+		g.drawRect(0,  400,  640,  16);
 		don.render(g);
 		knight.render(g);
 	}

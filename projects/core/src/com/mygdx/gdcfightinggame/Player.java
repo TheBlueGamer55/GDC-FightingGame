@@ -6,6 +6,7 @@ import org.mini2Dx.core.graphics.Graphics;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 
 public class Player{ //TODO refactor/organize code so that each character should extend this class
@@ -35,7 +36,7 @@ public class Player{ //TODO refactor/organize code so that each character should
 	public float maxKnockbackTime = 0.25f; //Should be half a second
 	public final float KNOCKBACK_FORCE = 0.75f; //affects how hard the player is knocked back based on the attack's force
 
-	public final float maxAttackCooldown = 0.1f; //TODO: why is time doubled?
+	public final float maxAttackCooldown = 0.05f; //TODO: why is time doubled? FPS?
 	public float attackCooldownTimer;
 	public boolean canAttack = true;
 
@@ -47,6 +48,9 @@ public class Player{ //TODO refactor/organize code so that each character should
 	public Block hitbox;
 	public Gameplay level;
 	public String type;
+	
+	//Dimensions are 33x27
+	public Sprite s, s2, current;
 
 	//Variables that represent the controls in order to make key bindings easier - TODO: Controls different for each character
 	protected int LEFT = Keys.A;
@@ -74,11 +78,22 @@ public class Player{ //TODO refactor/organize code so that each character should
 		this.ATTACK1 = attack1;
 		this.ATTACK2 = attack2; 
 		facingRight = true; //TODO change default depending on which side of the screen the player is at
+		s = new Sprite(new Texture(Gdx.files.internal("don_right_high.png"))); //TODO temporary sprite
+		s.setOrigin(0, 0);
+		s.flip(false, true);
+		s.setScale(2);
+		s2 = new Sprite(new Texture(Gdx.files.internal("don_right_low.png")));
+		s2.setOrigin(0, 0);
+		s2.flip(false, true);
+		s2.setScale(2);
+		current = s;
+		hitbox.setSize(16 * s.getScaleX(), s.getHeight() * s.getScaleY());
 	}
 
 	public void render(Graphics g){
-		g.setColor(Color.WHITE);
-		g.drawRect(x, y, 32, 32);
+		//g.setColor(Color.WHITE);
+		//g.drawRect(x, y, 32, 32);
+		g.drawSprite(current, x, y);
 	}
 
 	public void update(float delta){
@@ -107,10 +122,12 @@ public class Player{ //TODO refactor/organize code so that each character should
 		if(Gdx.input.isKeyJustPressed(this.ATTACK1) && canAttack){ //TODO: Can player attack in air? Crouching? While moving?
 			attack1();
 			canAttack = false; 
+			current = s;
 		}
 		if(Gdx.input.isKeyJustPressed(this.ATTACK2) && canAttack){
 			attack2();
 			canAttack = false;
+			current = s2;
 		}
 		//Apply friction when not moving or when exceeding the max horizontal speed
 		if(Math.abs(velX) > maxSpeedX || !Gdx.input.isKeyPressed(this.LEFT) && !Gdx.input.isKeyPressed(this.RIGHT)){
@@ -141,13 +158,13 @@ public class Player{ //TODO refactor/organize code so that each character should
 	 */
 	public void attack1(){
 		if(facingRight){
-			Projectile projectile = new Projectile(this.x + 30, this.y, 12, 4, this.level);
+			Projectile projectile = new Projectile(this.x + 30, this.y + 17, 18, 3, this.level);
 			projectile.parent = this;
 			projectile.velX = 2;
 			level.solids.add(projectile);
 		}
 		else if(facingLeft){
-			Projectile projectile = new Projectile(this.x - 30, this.y, 12, 4, this.level);
+			Projectile projectile = new Projectile(this.x - 30, this.y + 17, 18, 3, this.level);
 			projectile.parent = this;
 			projectile.velX = -2;
 			level.solids.add(projectile);
@@ -156,16 +173,17 @@ public class Player{ //TODO refactor/organize code so that each character should
 
 	/*
 	 * Low attack - should be overridden for each character
+	 * NOTE: The current code has correct coordinates for the don's second attack.
 	 */
 	public void attack2(){
 		if(facingRight){
-			Projectile projectile = new Projectile(this.x + 30, this.y + (hitbox.height / 2), 12, 4, this.level);
+			Projectile projectile = new Projectile(this.x + 30, this.y + (hitbox.height / 2) + 1, 18, 3, this.level);
 			projectile.parent = this;
 			projectile.velX = 2;
 			level.solids.add(projectile);
 		}
 		else if(facingLeft){
-			Projectile projectile = new Projectile(this.x - 30, this.y + (hitbox.height / 2), 12, 4, this.level);
+			Projectile projectile = new Projectile(this.x - 30, this.y + (hitbox.height / 2) + 1, 18, 3, this.level);
 			projectile.parent = this;
 			projectile.velX = -2;
 			level.solids.add(projectile);

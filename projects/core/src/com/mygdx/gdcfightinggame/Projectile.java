@@ -7,7 +7,7 @@ public class Projectile extends Block{
 	private static final long serialVersionUID = 1L;
 	
 	public float timer; //used to control how long a move exists
-	public float maxTimer = 0.5f; //the default value is 1 second (see Player class - why is time doubled?)
+	public float maxTimer = 0.1f; //the default value is 0.2 seconds (see Player class - why is time doubled?)
 	/* TODO lasts as long as the animation lasts
 	 * Each attack has one hitbox. Since attacks are instant, we only need one static hitbox per attack.
 	 */

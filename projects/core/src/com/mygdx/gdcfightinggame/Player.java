@@ -14,6 +14,27 @@ public class Player{ //TODO refactor/organize code so that each character should
 	public float x, y;
 	public float velX, velY;
 	public float accelX, accelY;
+	//Position/vel/accel
+	
+	
+	//***********************************************************************
+	//HEALTHBAR STUFF
+	//TODO Make this differ per player
+	public float maxHealth = 100.0f;
+	public float health = maxHealth;
+	
+	public float healthBarMaxWidth = 200;
+	public float healthBarHeight = 20;
+	
+	public float healthBarX = 50;
+	public float healthBarY = 20;
+	
+	public float healthBarRed = 0;
+	public float healthBarGreen = 0;
+	public float healthBarBlue = 0;
+
+	
+	//***********************************************************************
 
 	//Constants which may be adjusted later
 	public final float gravity = 0.2f;
@@ -91,8 +112,14 @@ public class Player{ //TODO refactor/organize code so that each character should
 	}
 
 	public void render(Graphics g){
-		//g.setColor(Color.WHITE);
+		g.setColor(Color.WHITE);
+		g.drawRect(healthBarX, healthBarY, healthBarMaxWidth, healthBarHeight);
+		
+		g.setColor(new Color(healthBarRed, healthBarGreen, healthBarBlue, 1.0f));
+		g.drawRect(healthBarX, healthBarY, minZero(healthBarMaxWidth * getHealthPercentage()), healthBarHeight);
+		
 		//g.drawRect(x, y, 32, 32);
+		g.setColor(Color.WHITE);
 		g.drawSprite(current, x, y);
 	}
 
@@ -149,6 +176,20 @@ public class Player{ //TODO refactor/organize code so that each character should
 		gravity();
 		hitbox.setX(this.x);
 		hitbox.setY(this.y);
+		
+		
+		
+		healthBarRed = minZero( (float) ( 2 * (0.5 - getHealthPercentage() ) ));
+		healthBarGreen = minZero( (float) (1.0 - 2 * Math.abs(0.5 - getHealthPercentage())));
+		healthBarBlue = minZero(  (float) (2 * (getHealthPercentage() - 0.5)) );
+		
+		
+	}
+	
+	public void damage( float amount ){//Damages this unit
+		
+		this.health -= amount;
+		
 	}
 
 	/*
@@ -200,6 +241,9 @@ public class Player{ //TODO refactor/organize code so that each character should
 			}
 			else{ //Hit by opponent's attack
 				if(x <= other.x + other.width && x + hitbox.width >= other.x && y <= other.y + other.height && y + hitbox.height >= other.y){
+					
+					this.damage( ((Projectile)other).damageAmount);
+					
 					isKnockedBack = true;
 					//TODO health and damage
 					knockbackTimer = maxKnockbackTime;
@@ -324,7 +368,15 @@ public class Player{ //TODO refactor/organize code so that each character should
 	public void jump(){
 		velY = -jumpSpeed;
 	}
+	
+	public float minZero( float input ){
+		return( input > 0 ? input : 0 );
+	}
 
+	public float getHealthPercentage(){
+		return(health/maxHealth);
+	}
+	
 	/*
 	 * Returns the current tile position of the player, given the specific tile dimensions
 	 */

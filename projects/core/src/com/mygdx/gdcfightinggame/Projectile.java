@@ -12,6 +12,8 @@ public class Projectile extends Block{
 	 * Each attack has one hitbox. Since attacks are instant, we only need one static hitbox per attack.
 	 */
 	
+	public float damageAmount = 15;//TODO this should differ based on the attack type.
+	
 	public Player parent;
 
 	public Projectile(float x, float y, float velX, float velY, float accelX, float accelY, float width, float height, Gameplay level, Player parent) {

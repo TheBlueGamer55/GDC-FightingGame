@@ -116,8 +116,10 @@ public class Player{ //TODO refactor/organize code so that each character should
 		g.drawRect(healthBarX, healthBarY, healthBarMaxWidth, healthBarHeight);
 		
 		g.setColor(new Color(healthBarRed, healthBarGreen, healthBarBlue, 1.0f));
-		g.drawRect(healthBarX, healthBarY, minZero(healthBarMaxWidth * getHealthPercentage()), healthBarHeight);
+		g.fillRect(healthBarX, healthBarY, minZero(healthBarMaxWidth * getHealthPercentage()), healthBarHeight);
 		
+		
+
 		//g.drawRect(x, y, 32, 32);
 		g.setColor(Color.WHITE);
 		g.drawSprite(current, x, y);
@@ -179,10 +181,24 @@ public class Player{ //TODO refactor/organize code so that each character should
 		
 		
 		
-		healthBarRed = minZero( (float) ( 2 * (0.5 - getHealthPercentage() ) ));
-		healthBarGreen = minZero( (float) (1.0 - 2 * Math.abs(0.5 - getHealthPercentage())));
-		healthBarBlue = minZero(  (float) (2 * (getHealthPercentage() - 0.5)) );
+		//healthBarRed = minZero( (float) ( 2 * (0.5 - getHealthPercentage() ) ));
+		//healthBarGreen = minZero( (float) (1.0 - 2 * Math.abs(0.5 - getHealthPercentage())));
+		//healthBarBlue = minZero(  (float) (2 * (getHealthPercentage() - 0.5)) );
 		
+		if( getHealthPercentage() == 1.0f ){
+			
+			healthBarRed = 1.0f;
+			healthBarGreen = 1.0f;
+			healthBarBlue = 1.0f;
+			
+		}
+		
+		else{
+			
+			healthBarRed = minZero( (float) (1.0 - getHealthPercentage()) );
+			healthBarGreen = minZero( (float) (getHealthPercentage()) );
+			healthBarBlue = 0;
+		}
 		
 	}
 	

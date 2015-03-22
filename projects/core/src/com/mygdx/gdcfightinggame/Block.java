@@ -28,12 +28,12 @@ public class Block extends Rectangle{
 	protected Gameplay level;
 	public String type;
 
-	public Block(float x, float y, float width, float height, Gameplay level){
+	public Block(float x, float y, float velX, float velY, float accelX, float accelY, float width, float height, Gameplay level){
 		super(x, y, width, height);
-		velX = 0;
-		velY = 0;
-		accelX = 0;
-		accelY = 0;
+		this.velX = velX;
+		this.velY = velY;
+		this.accelX = accelX;
+		this.accelY = accelY;
 		isActive = true;
 		this.level = level;
 		type = "Block";

@@ -62,7 +62,7 @@ public class Player{ //TODO refactor/organize code so that each character should
 	public Player(float x, float y, Gameplay level, int left, int right, int jump, int attack1, int attack2){
 		this.x = x;
 		this.y = y;
-		hitbox = new Block(x, y, 32, 32, level); //TODO add sprite dimensions later
+		hitbox = new Block(x, y, 0, 0, 0, 0, 32, 32, level); //TODO add sprite dimensions later
 		hitbox.type = "Hitbox";
 		velX = 0;
 		velY = 0;
@@ -158,15 +158,15 @@ public class Player{ //TODO refactor/organize code so that each character should
 	 */
 	public void attack1(){
 		if(facingRight){
-			Projectile projectile = new Projectile(this.x + 30, this.y + 17, 18, 3, this.level);
-			projectile.parent = this;
-			projectile.velX = 2;
+			RelativeProjectile projectile = new RelativeProjectile(0, -5, 2, 0, 0, 0, 12, 4, this.level, this);
+			//projectile.parent = this;
+			//projectile.velX = 2;
 			level.solids.add(projectile);
 		}
 		else if(facingLeft){
-			Projectile projectile = new Projectile(this.x - 30, this.y + 17, 18, 3, this.level);
-			projectile.parent = this;
-			projectile.velX = -2;
+			RelativeProjectile projectile = new RelativeProjectile(0, -5, -2, 0, 0, 0, 12, 4, this.level, this);
+			//projectile.parent = this;
+			//projectile.velX = -2;
 			level.solids.add(projectile);
 		}
 	}
@@ -177,15 +177,12 @@ public class Player{ //TODO refactor/organize code so that each character should
 	 */
 	public void attack2(){
 		if(facingRight){
-			Projectile projectile = new Projectile(this.x + 30, this.y + (hitbox.height / 2) + 1, 18, 3, this.level);
-			projectile.parent = this;
-			projectile.velX = 2;
+			RelativeProjectile projectile = new RelativeProjectile(0, 5, 2, 0, 0, 0, 12, 4, this.level, this);
 			level.solids.add(projectile);
 		}
 		else if(facingLeft){
-			Projectile projectile = new Projectile(this.x - 30, this.y + (hitbox.height / 2) + 1, 18, 3, this.level);
-			projectile.parent = this;
-			projectile.velX = -2;
+			RelativeProjectile projectile = new RelativeProjectile(0, 5, -2, 0, 0, 0, 12, 4, this.level, this);
+
 			level.solids.add(projectile);
 		}
 	}

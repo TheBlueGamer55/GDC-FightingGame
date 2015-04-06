@@ -19,7 +19,7 @@ public class Player{ //TODO refactor/organize code so that each character should
 	
 	//***********************************************************************
 	//HEALTHBAR STUFF
-	//TODO Make this differ per player
+
 	public float maxHealth = 100.0f;
 	public float health = maxHealth;
 	
@@ -70,6 +70,8 @@ public class Player{ //TODO refactor/organize code so that each character should
 	public Gameplay level;
 	public String type;
 	
+	public ButtonChain myChain;
+	
 	//Dimensions are 33x27
 	public Sprite s, s2, current;
 
@@ -110,6 +112,8 @@ public class Player{ //TODO refactor/organize code so that each character should
 		current = s;
 		hitbox.setSize(16 * s.getScaleX(), s.getHeight() * s.getScaleY());
 		
+		this.myChain = new ButtonChain(200.0f);
+		
 		if( playerID == 1 ){
 			
 			healthBarX = 50;
@@ -146,26 +150,44 @@ public class Player{ //TODO refactor/organize code so that each character should
 
 		//Move Left
 		if(Gdx.input.isKeyPressed(this.LEFT) && velX > -maxSpeedX){
+			myChain.addPress('L');
 			accelX = -moveSpeed;
 		}
 		//Move Right
 		if(Gdx.input.isKeyPressed(this.RIGHT) && velX < maxSpeedX){
+			myChain.addPress('R');
 			accelX = moveSpeed;
 		}
 		//Jump
-		if(Gdx.input.isKeyJustPressed(this.JUMP) && onGround){
-			jump();
+		if(Gdx.input.isKeyJustPressed(this.JUMP) ){
+			
+			myChain.addPress('J');
+			
+			if(onGround){
+				jump();
+			}
+			
 		}
 		//Attack 1
-		if(Gdx.input.isKeyJustPressed(this.ATTACK1) && canAttack){ //TODO: Can player attack in air? Crouching? While moving?
-			attack1();
-			canAttack = false; 
-			current = s;
+		if(Gdx.input.isKeyJustPressed(this.ATTACK1) ){ //TODO: Can player attack in air? Crouching? While moving?
+			
+			myChain.addPress('1');
+			
+			if(canAttack){
+				attack1();
+				canAttack = false; 
+				current = s;
+			}
 		}
-		if(Gdx.input.isKeyJustPressed(this.ATTACK2) && canAttack){
-			attack2();
-			canAttack = false;
-			current = s2;
+		if(Gdx.input.isKeyJustPressed(this.ATTACK2)){
+			
+			myChain.addPress('2');
+			
+			if(canAttack){
+				attack2();
+				canAttack = false;
+				current = s2;
+			}
 		}
 		//Apply friction when not moving or when exceeding the max horizontal speed
 		if(Math.abs(velX) > maxSpeedX || !Gdx.input.isKeyPressed(this.LEFT) && !Gdx.input.isKeyPressed(this.RIGHT)){

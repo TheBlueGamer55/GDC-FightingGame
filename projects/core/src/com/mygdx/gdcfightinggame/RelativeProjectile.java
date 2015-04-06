@@ -4,7 +4,6 @@ import org.mini2Dx.core.graphics.Graphics;
 
 public class RelativeProjectile extends Projectile{//Projectiles whose positions are calculated relative to their parents' centers
 
-	
 	float relativeX = 0;
 	float relativeY = 0;
 	
@@ -19,12 +18,10 @@ public class RelativeProjectile extends Projectile{//Projectiles whose positions
 		timer = 0.0f;
 	}
 	
-	
 	public void render(Graphics g){
 		//TODO Leave this method empty unless we want something specific drawn later on.
 		super.render(g);
-	}
-	
+	}	
 	
 	@Override
 	public void update(float delta){
@@ -39,7 +36,7 @@ public class RelativeProjectile extends Projectile{//Projectiles whose positions
 				level.solids.remove(this);
 			}
 			
-			this.setX(x);//why is this necessary?
+			this.setX(x);
 			this.setY(y);
 		}
 	}
@@ -70,7 +67,7 @@ public class RelativeProjectile extends Projectile{//Projectiles whose positions
 		}
 		relativeX += velX;
 		velX += accelX;
-		x = (float) (parent.x + parent.hitbox.width / 2.0 + relativeX);//start it at the center of the player's hitbox, then move to its relative x
+		x = (float) (parent.x + parent.hitbox.width / 2.0 + relativeX); //start it at the center of the player's hitbox, then move to its relative x
 	}
 
 	/*
@@ -94,7 +91,7 @@ public class RelativeProjectile extends Projectile{//Projectiles whose positions
 		}
 		relativeY += velY;
 		velY += accelY;
-		y = (float) (parent.y + parent.hitbox.height / 2.0 + relativeY);//start it at the center of the player's hitbox, then move to its relative x
+		y = (float) (parent.y + parent.hitbox.height / 2.0 + relativeY); //start it at the center of the player's hitbox, then move to its relative x
 	}
 	
 }

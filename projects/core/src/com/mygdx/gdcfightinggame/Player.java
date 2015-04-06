@@ -57,7 +57,7 @@ public class Player{ //TODO refactor/organize code so that each character should
 	public float maxKnockbackTime = 0.25f; //Should be half a second
 	public final float KNOCKBACK_FORCE = 0.75f; //affects how hard the player is knocked back based on the attack's force
 
-	public final float maxAttackCooldown = 0.05f; //TODO: why is time doubled? FPS?
+	public final float maxAttackCooldown = 0.05f;
 	public float attackCooldownTimer;
 	public boolean canAttack = true;
 
@@ -85,7 +85,7 @@ public class Player{ //TODO refactor/organize code so that each character should
 	public Player(float x, float y, int playerID, Gameplay level, int left, int right, int jump, int attack1, int attack2){
 		this.x = x;
 		this.y = y;
-		hitbox = new Block(x, y, 0, 0, 0, 0, 32, 32, level); //TODO add sprite dimensions later
+		hitbox = new Block(x, y, 0, 0, 0, 0, 32, 32, level); //the hitbox's dimensions change to fit the sprite
 		hitbox.type = "Hitbox";
 		velX = 0;
 		velY = 0;
@@ -100,7 +100,7 @@ public class Player{ //TODO refactor/organize code so that each character should
 		this.JUMP = jump;
 		this.ATTACK1 = attack1;
 		this.ATTACK2 = attack2; 
-		facingRight = true; //TODO change default depending on which side of the screen the player is at
+		
 		s = new Sprite(new Texture(Gdx.files.internal("don_right_high.png"))); //TODO temporary sprite
 		s.setOrigin(0, 0);
 		s.flip(false, true);
@@ -115,12 +115,20 @@ public class Player{ //TODO refactor/organize code so that each character should
 		this.myChain = new ButtonChain(200.0f);
 		
 		if( playerID == 1 ){
-			
 			healthBarX = 50;
-
+			
+			facingRight = true;
+			facingLeft = false;
 		}
 		else if( playerID == 2){
 			healthBarX = Gdx.graphics.getWidth() - (healthBarMaxWidth + 50);
+			
+			s.flip(true, false);
+			s2.flip(true, false);
+			s.setOrigin(s.getWidth(), 0);
+			s2.setOrigin(s2.getWidth(), 0);
+			facingRight = false;
+			facingLeft = true;
 		}
 	}
 
@@ -131,9 +139,6 @@ public class Player{ //TODO refactor/organize code so that each character should
 		g.setColor(new Color(healthBarRed, healthBarGreen, healthBarBlue, 1.0f));
 		g.fillRect(healthBarX, healthBarY, minZero(healthBarMaxWidth * getHealthPercentage()), healthBarHeight);
 		
-		
-
-		//g.drawRect(x, y, 32, 32);
 		g.setColor(Color.WHITE);
 		g.drawSprite(current, x, y);
 	}
@@ -208,35 +213,26 @@ public class Player{ //TODO refactor/organize code so that each character should
 		move();
 		gravity();
 		hitbox.setX(this.x);
-		hitbox.setY(this.y);
-		
-		
+		hitbox.setY(this.y);		
 		
 		//healthBarRed = minZero( (float) ( 2 * (0.5 - getHealthPercentage() ) ));
 		//healthBarGreen = minZero( (float) (1.0 - 2 * Math.abs(0.5 - getHealthPercentage())));
 		//healthBarBlue = minZero(  (float) (2 * (getHealthPercentage() - 0.5)) );
 		
 		if( getHealthPercentage() == 1.0f ){
-			
 			healthBarRed = 1.0f;
 			healthBarGreen = 1.0f;
 			healthBarBlue = 1.0f;
-			
 		}
-		
 		else{
-			
 			healthBarRed = minZero( (float) (1.0 - getHealthPercentage()) );
 			healthBarGreen = minZero( (float) (getHealthPercentage()) );
 			healthBarBlue = 0;
 		}
-		
 	}
 	
 	public void damage( float amount ){//Damages this unit
-		
 		this.health -= amount;
-		
 	}
 
 	/*
@@ -247,21 +243,16 @@ public class Player{ //TODO refactor/organize code so that each character should
 	public void attack1(){
 		if(facingRight){
 			RelativeProjectile projectile = new RelativeProjectile(0, -5, 2, 0, 0, 0, 12, 4, this.level, this);
-			//projectile.parent = this;
-			//projectile.velX = 2;
 			level.solids.add(projectile);
 		}
 		else if(facingLeft){
 			RelativeProjectile projectile = new RelativeProjectile(0, -5, -2, 0, 0, 0, 12, 4, this.level, this);
-			//projectile.parent = this;
-			//projectile.velX = -2;
 			level.solids.add(projectile);
 		}
 	}
 
 	/*
 	 * Low attack - should be overridden for each character
-	 * NOTE: The current code has correct coordinates for the don's second attack.
 	 */
 	public void attack2(){
 		if(facingRight){
@@ -270,7 +261,6 @@ public class Player{ //TODO refactor/organize code so that each character should
 		}
 		else if(facingLeft){
 			RelativeProjectile projectile = new RelativeProjectile(0, 5, -2, 0, 0, 0, 12, 4, this.level, this);
-
 			level.solids.add(projectile);
 		}
 	}
@@ -292,19 +282,7 @@ public class Player{ //TODO refactor/organize code so that each character should
 					this.damage( ((Projectile)other).damageAmount);
 					
 					isKnockedBack = true;
-					//TODO health and damage
 					knockbackTimer = maxKnockbackTime;
-					
-					/*
-					//Normalize the bullet/projectile's velocity vector
-					float magnitude = (float) Math.sqrt(other.velX * other.velX + other.velY * other.velY);
-					System.out.println(other.velX + ", " + other.velY);
-					float unitVelX = other.velX / magnitude;
-					float unitVelY = other.velY / magnitude;
-					//Player gets knocked back in the direction of the bullet/projectile
-					knockbackVectorX = unitVelX; 
-					knockbackVectorY = unitVelY;
-					*/
 					knockbackVectorX = facingLeft ? 2 : -2; //TODO knockback force may depend on the attack type
 					knockbackVectorY = 0;
 					level.solids.remove(other);

@@ -7,12 +7,12 @@ public class Projectile extends Block{
 	private static final long serialVersionUID = 1L;
 	
 	public float timer; //used to control how long a move exists
-	public float maxTimer = 0.1f; //the default value is 0.2 seconds (see Player class - why is time doubled?)
+	public float maxTimer = 0.2f; //the default value is 0.4 seconds
 	/* TODO lasts as long as the animation lasts
 	 * Each attack has one hitbox. Since attacks are instant, we only need one static hitbox per attack.
 	 */
 	
-	public float damageAmount = 15;//TODO this should differ based on the attack type.
+	public float damageAmount = 5;//TODO this should differ based on the attack type.
 	
 	public Player parent;
 
@@ -43,7 +43,7 @@ public class Projectile extends Block{
 				level.solids.remove(this);
 			}
 			
-			this.setX(x);//why is this necessary?
+			this.setX(x);
 			this.setY(y);
 		}
 	}

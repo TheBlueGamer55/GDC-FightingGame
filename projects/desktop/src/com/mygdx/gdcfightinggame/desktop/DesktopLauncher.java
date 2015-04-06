@@ -13,8 +13,8 @@ public class DesktopLauncher{
         cfg.width = 640;
         cfg.height = 480;
         cfg.vSyncEnabled = true;
-        cfg.foregroundFPS = 0;
-        cfg.backgroundFPS = 0;
+        cfg.foregroundFPS = 60;
+        cfg.backgroundFPS = 60;
         new LwjglApplication(new DesktopMini2DxGame("org.mini2dx.sample.basicgameexample", new SwordFightingGame()), cfg);
 	}
 }

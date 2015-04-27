@@ -2,7 +2,7 @@ package com.mygdx.gdcfightinggame;
 
 import org.mini2Dx.core.graphics.Graphics;
 
-public class RelativeProjectile extends Projectile{//Projectiles whose positions are calculated relative to their parents' centers
+public class RelativeProjectile extends Projectile{ //Projectiles whose positions are calculated relative to their parents' centers
 
 	float relativeX = 0;
 	float relativeY = 0;

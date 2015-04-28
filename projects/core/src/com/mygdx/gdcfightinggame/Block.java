@@ -147,4 +147,17 @@ public class Block extends Rectangle{
 		return false;
 	}
 	
+	/*
+	 * Helper method that returns a block that is colliding with this block
+	 */
+	public Block blockExistsAt(float x, float y){
+		for(int i = 0; i < level.solids.size(); i++){
+			Block solid = level.solids.get(i);
+			if(solid != this && isColliding(solid, x, y)){
+				return solid;
+			}
+		}
+		return null;
+	}
+	
 }

@@ -56,6 +56,10 @@ public class Player{ //TODO refactor/organize code so that each character should
 	public float knockbackTimer;
 	public float maxKnockbackTime = 0.25f; //Should be half a second
 	public final float KNOCKBACK_FORCE = 0.75f; //affects how hard the player is knocked back based on the attack's force
+	
+	public boolean isStunned = false; //TODO should stun happen only when two attacks hit?
+	public float stunTimer;
+	public float maxStunTimer = 0.25f; //How long a player is stunned for
 
 	public final float maxAttackCooldown = 0.05f;
 	public float attackCooldownTimer;
@@ -174,7 +178,7 @@ public class Player{ //TODO refactor/organize code so that each character should
 			
 		}
 		//Attack 1
-		if(Gdx.input.isKeyJustPressed(this.ATTACK1) ){ //TODO: Can player attack in air? Crouching? While moving?
+		if(Gdx.input.isKeyJustPressed(this.ATTACK1) && !isStunned){ //TODO: Can player attack in air? Crouching? While moving?
 			
 			myChain.addPress('1');
 			
@@ -184,7 +188,7 @@ public class Player{ //TODO refactor/organize code so that each character should
 				current = s;
 			}
 		}
-		if(Gdx.input.isKeyJustPressed(this.ATTACK2)){
+		if(Gdx.input.isKeyJustPressed(this.ATTACK2) && !isStunned){
 			
 			myChain.addPress('2');
 			
@@ -205,6 +209,15 @@ public class Player{ //TODO refactor/organize code so that each character should
 			if(attackCooldownTimer >= maxAttackCooldown){
 				attackCooldownTimer = 0;
 				canAttack = true;
+			}
+		}
+		
+		//Stun cooldown
+		if(isStunned){
+			stunTimer += delta;
+			if(stunTimer >= maxStunTimer){
+				stunTimer = 0;
+				isStunned = false;
 			}
 		}
 

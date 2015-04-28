@@ -21,14 +21,15 @@ public class MainMenu implements GameScreen, InputProcessor{
 	public static int ID = 1;
 
 	//Used to determine which menu the game is on
-	public boolean characterSelect = false;
-	public boolean stageSelect = false;
-	public boolean startSelect = true;
-	public boolean readyToStart = false;
-	
+	public static boolean characterSelect = false;
+	public static boolean stageSelect = false;
+	public static boolean startSelect = true;
+	public static boolean readyToStart = false;
+	public static boolean isPlaying = false;
+
 	public float startTimer = 0;
 	public float maxStartTimer = 0.25f;
-	
+
 	public Sound sfxStart; //TODO add later
 	public Sound sfxMove;
 
@@ -65,7 +66,7 @@ public class MainMenu implements GameScreen, InputProcessor{
 		stageHighlight.flip(false, true);
 
 		currentMenu = mainMenu;
-		
+
 		sfxStart = Gdx.audio.newSound(Gdx.files.internal("hard_select.wav"));
 		sfxMove = Gdx.audio.newSound(Gdx.files.internal("select03.wav"));
 
@@ -83,12 +84,17 @@ public class MainMenu implements GameScreen, InputProcessor{
 
 	@Override
 	public void postTransitionOut(Transition t){
-
+		isPlaying = true;
 	}
 
 	@Override
 	public void preTransitionIn(Transition t){
-
+		isPlaying = false;
+		characterSelect = false;
+		stageSelect = false;
+		startSelect = true;
+		readyToStart = false;
+		currentMenu = mainMenu;
 	}
 
 	@Override
@@ -138,38 +144,38 @@ public class MainMenu implements GameScreen, InputProcessor{
 
 	@Override
 	public boolean keyDown(int keycode) {
-		System.out.println(stageChoice);
-		if(startSelect){
-			if(keycode == Keys.ENTER){
-				startSelect = false;
-				stageSelect = true;
-				currentMenu = stageMenu;
-				sfxStart.play();
+		if(!isPlaying){ //Hacky fix for stopping input handling when in the Gameplay state
+			if(startSelect){
+				if(keycode == Keys.ENTER){
+					startSelect = false;
+					stageSelect = true;
+					currentMenu = stageMenu;
+					sfxStart.play();
+				}
+				if(keycode == Keys.ESCAPE){
+					Gdx.app.exit();
+				}
 			}
-			if(keycode == Keys.ESCAPE){
-				Gdx.app.exit();
+			else if(stageSelect){
+				if(keycode == Keys.LEFT){
+					stageChoice = 1;
+					sfxMove.play();
+				}
+				else if(keycode == Keys.RIGHT){
+					stageChoice = 2;
+					sfxMove.play();
+				}
+				if(keycode == Keys.ENTER){
+					readyToStart = true;
+					sfxStart.play();
+				}
+				if(keycode == Keys.ESCAPE){
+					stageSelect = false;
+					startSelect = true;
+					currentMenu = mainMenu;
+				}
 			}
 		}
-		else if(stageSelect){
-			if(keycode == Keys.LEFT){
-				stageChoice = 1;
-				sfxMove.play();
-			}
-			else if(keycode == Keys.RIGHT){
-				stageChoice = 2;
-				sfxMove.play();
-			}
-			if(keycode == Keys.ENTER){
-				readyToStart = true;
-				sfxStart.play();
-			}
-			if(keycode == Keys.ESCAPE){
-				stageSelect = false;
-				startSelect = true;
-				currentMenu = mainMenu;
-			}
-		}
-
 		return false;
 	}
 

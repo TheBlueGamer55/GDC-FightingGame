@@ -6,9 +6,9 @@ public class RelativeProjectile extends Projectile{ //Projectiles whose position
 
 	float relativeX = 0;
 	float relativeY = 0;
-	
+
 	private static final long serialVersionUID = 1L;
-	
+
 	public RelativeProjectile(float x, float y, float velX, float velY, float accelX, float accelY, float width, float height, Gameplay level, Player parent) {
 		super(0, 0, velX, velY, accelX, accelY, width, height, level, parent);
 		relativeX = x;
@@ -16,31 +16,32 @@ public class RelativeProjectile extends Projectile{ //Projectiles whose position
 		//TODO make sure this is everything we need for the constructor
 		this.type = "Projectile";
 		timer = 0.0f;
+		this.x = (float) (parent.x + parent.hitbox.width / 2.0 + relativeX);
+		this.y = (float) (parent.y + parent.hitbox.height / 2.0 + relativeY);
 	}
-	
+
 	public void render(Graphics g){
-		//TODO Leave this method empty unless we want something specific drawn later on.
 		super.render(g);
 	}	
-	
+
 	@Override
 	public void update(float delta){
 		if(isActive){
 			limitSpeed(false, true);
 			move();
-			
+
 			//Attacks last for a limited time
 			timer += delta;
 			if(timer >= maxTimer){
 				timer = 0;
 				level.solids.remove(this);
 			}
-			
+
 			this.setX(x);
 			this.setY(y);
 		}
 	}
-	
+
 	public void move(){
 		moveX();
 		moveY();
@@ -54,6 +55,14 @@ public class RelativeProjectile extends Projectile{ //Projectiles whose position
 			Block solid = level.solids.get(i);
 			if(solid != this && isColliding(solid, x, y)){
 				if(solid.type.equals("Projectile") && this.type.equals("Projectile")){
+					Player parent = ((Projectile)this).parent;
+					Player other = ((Projectile)solid).parent;
+					
+					if(parent != other){ 
+						stun(parent);
+						stun(other);
+					}
+
 					level.solids.remove(this);
 					level.solids.remove(solid);
 					break;
@@ -78,6 +87,14 @@ public class RelativeProjectile extends Projectile{ //Projectiles whose position
 			Block solid = level.solids.get(i);
 			if(solid != this && isColliding(solid, x, y)){
 				if(solid.type.equals("Projectile") && this.type.equals("Projectile")){
+					Player parent = ((Projectile)this).parent;
+					Player other = ((Projectile)solid).parent;
+					
+					if(parent != other){
+						stun(parent);
+						stun(other);
+					}
+
 					level.solids.remove(this);
 					level.solids.remove(solid);
 					break;
@@ -93,5 +110,19 @@ public class RelativeProjectile extends Projectile{ //Projectiles whose position
 		velY += accelY;
 		y = (float) (parent.y + parent.hitbox.height / 2.0 + relativeY); //start it at the center of the player's hitbox, then move to its relative x
 	}
-	
+
+	/*
+	 * Applies a stun and knockback to a player
+	 * TODO adjust stun until it works properly
+	 */
+	public void stun(Player p){
+		if(!p.isStunned && !p.isKnockedBack){
+			p.isStunned = true;
+			p.isKnockedBack = true;
+			p.knockbackTimer = p.maxKnockbackTime;
+			p.knockbackVectorX = p.facingLeft ? 2 : -2; 
+			p.knockbackVectorY = 0;
+		}
+	}
+
 }

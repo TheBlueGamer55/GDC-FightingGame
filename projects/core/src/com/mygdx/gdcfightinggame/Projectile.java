@@ -7,7 +7,7 @@ public class Projectile extends Block{
 	private static final long serialVersionUID = 1L;
 	
 	public float timer; //used to control how long a move exists
-	public float maxTimer = 0.2f; //the default value is 0.4 seconds
+	public float maxTimer = 0.2f; //TODO adjust later
 	/* TODO lasts as long as the animation lasts
 	 * Each attack has one hitbox. Since attacks are instant, we only need one static hitbox per attack.
 	 */
@@ -26,7 +26,6 @@ public class Projectile extends Block{
 	
 	@Override
 	public void render(Graphics g){
-		//TODO Leave this method empty unless we want something specific drawn later on.
 		super.render(g);
 	}
 	

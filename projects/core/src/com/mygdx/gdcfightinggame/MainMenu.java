@@ -14,11 +14,15 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 
 public class MainMenu implements GameScreen, InputProcessor{
 
 	public static int ID = 1;
+	
+	public static final String FONT_CHARACTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789][_!$%#@|\\/?-+=()*&.;:,{}\"´`'<>";
 
 	//Used to determine which menu the game is on
 	public static boolean characterSelect = false;
@@ -45,6 +49,8 @@ public class MainMenu implements GameScreen, InputProcessor{
 	public int stageHighlightYRight = 83;
 
 	public int stageChoice = 1; //default stage is desert
+	
+	public BitmapFont font;
 
 	@Override
 	public int getId(){
@@ -69,6 +75,10 @@ public class MainMenu implements GameScreen, InputProcessor{
 
 		sfxStart = Gdx.audio.newSound(Gdx.files.internal("hard_select.wav"));
 		sfxMove = Gdx.audio.newSound(Gdx.files.internal("select03.wav"));
+		
+		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("Pixel-UniCode.ttf"));
+		font = generator.generateFont(24, MainMenu.FONT_CHARACTERS, true);
+		generator.dispose();
 
 		Gdx.input.setInputProcessor(this);
 	}
@@ -104,6 +114,7 @@ public class MainMenu implements GameScreen, InputProcessor{
 
 	@Override
 	public void render(GameContainer gc, Graphics g){
+		g.setFont(font);
 		g.setBackgroundColor(Color.RED);
 		g.drawSprite(currentMenu, 0, 0);
 		if(stageSelect){

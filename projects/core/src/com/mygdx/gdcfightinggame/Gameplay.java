@@ -77,7 +77,6 @@ public class Gameplay implements GameScreen{
 
 	@Override
 	public void postTransitionIn(Transition t){
-		//TODO change later when level selection is added
 		desertTheme.stop(); //make sure we aren't playing the same song multiple times at once
 		desertTheme.loop();
 		roundStarting = true;

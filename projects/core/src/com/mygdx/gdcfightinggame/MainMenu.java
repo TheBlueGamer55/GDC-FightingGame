@@ -34,7 +34,7 @@ public class MainMenu implements GameScreen, InputProcessor{
 	public float startTimer = 0;
 	public float maxStartTimer = 0.25f;
 
-	public Sound sfxStart; //TODO add later
+	public Sound sfxStart; 
 	public Sound sfxMove;
 
 	public Sprite mainMenu;
@@ -59,7 +59,7 @@ public class MainMenu implements GameScreen, InputProcessor{
 
 	@Override
 	public void initialise(GameContainer gc){
-		mainMenu = new Sprite(new Texture(Gdx.files.internal("main_menu.png"))); //TODO temporary main menu
+		mainMenu = new Sprite(new Texture(Gdx.files.internal("main_menu.png")));
 		mainMenu.setOrigin(0, 0);
 		mainMenu.flip(false, true);
 

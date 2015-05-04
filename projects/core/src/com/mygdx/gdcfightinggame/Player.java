@@ -9,31 +9,31 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 
-public class Player{ //TODO refactor/organize code so that each character should extend this class
+public class Player{ 
 
 	public float x, y;
 	public float velX, velY;
 	public float accelX, accelY;
 	//Position/vel/accel
-	
-	
+
+
 	//***********************************************************************
 	//HEALTHBAR STUFF
 
 	public float maxHealth = 100.0f;
 	public float health = maxHealth;
-	
+
 	public float healthBarMaxWidth = 200;
 	public float healthBarHeight = 20;
-	
+
 	public float healthBarX = 50;
 	public float healthBarY = 20;
-	
+
 	public float healthBarRed = 0;
 	public float healthBarGreen = 0;
 	public float healthBarBlue = 0;
 
-	
+
 	//***********************************************************************
 
 	//Constants which may be adjusted later
@@ -56,15 +56,16 @@ public class Player{ //TODO refactor/organize code so that each character should
 	public float knockbackTimer;
 	public float maxKnockbackTime = 0.25f; //Should be half a second
 	public final float KNOCKBACK_FORCE = 0.75f; //affects how hard the player is knocked back based on the attack's force
-	
-	public boolean isStunned = false; //TODO should stun happen only when two attacks hit?
+
+	public boolean isStunned = false; 
 	public float stunTimer;
 	public float maxStunTimer = 0.25f; //How long a player is stunned for
 
-	public final float maxAttackCooldown = 0.05f;
+	public final float maxAttackCooldown = 0.3f;
 	public float attackCooldownTimer;
 	public boolean canAttack = true;
 
+	public boolean canMove = true;
 	public boolean onGround;
 	public boolean isActive;
 
@@ -73,9 +74,10 @@ public class Player{ //TODO refactor/organize code so that each character should
 	public Block hitbox;
 	public Gameplay level;
 	public String type;
-	
+	public int id;
+
 	public ButtonChain myChain;
-	
+
 	//Dimensions are 33x27
 	public Sprite s, s2, current;
 
@@ -91,6 +93,8 @@ public class Player{ //TODO refactor/organize code so that each character should
 		this.y = y;
 		hitbox = new Block(x, y, 0, 0, 0, 0, 32, 32, level); //the hitbox's dimensions change to fit the sprite
 		hitbox.type = "Hitbox";
+		hitbox.setParent(this);
+		this.id = playerID;
 		velX = 0;
 		velY = 0;
 		accelX = 0;
@@ -104,7 +108,7 @@ public class Player{ //TODO refactor/organize code so that each character should
 		this.JUMP = jump;
 		this.ATTACK1 = attack1;
 		this.ATTACK2 = attack2; 
-		
+
 		s = new Sprite(new Texture(Gdx.files.internal("don_right_high.png"))); //TODO temporary sprite
 		s.setOrigin(0, 0);
 		s.flip(false, true);
@@ -115,18 +119,18 @@ public class Player{ //TODO refactor/organize code so that each character should
 		s2.setScale(2);
 		current = s;
 		hitbox.setSize(16 * s.getScaleX(), s.getHeight() * s.getScaleY());
-		
+
 		myChain = new ButtonChain(200.0f);
-		
+
 		if( playerID == 1 ){
 			healthBarX = 50;
-			
+
 			facingRight = true;
 			facingLeft = false;
 		}
 		else if( playerID == 2){
 			healthBarX = Gdx.graphics.getWidth() - (healthBarMaxWidth + 50);
-			
+
 			s.flip(true, false);
 			s2.flip(true, false);
 			s.setOrigin(s.getWidth(), 0);
@@ -139,10 +143,10 @@ public class Player{ //TODO refactor/organize code so that each character should
 	public void render(Graphics g){
 		g.setColor(Color.WHITE);
 		g.drawRect(healthBarX, healthBarY, healthBarMaxWidth, healthBarHeight);
-		
+
 		g.setColor(new Color(healthBarRed, healthBarGreen, healthBarBlue, 1.0f));
 		g.fillRect(healthBarX, healthBarY, minZero(healthBarMaxWidth * getHealthPercentage()), healthBarHeight);
-		
+
 		g.setColor(Color.WHITE);
 		g.drawSprite(current, x, y);
 	}
@@ -169,32 +173,35 @@ public class Player{ //TODO refactor/organize code so that each character should
 		}
 		//Jump
 		if(Gdx.input.isKeyJustPressed(this.JUMP) ){
-			
+
 			myChain.addPress('J');
-			
+
 			if(onGround){
 				jump();
 			}
-			
+
 		}
+		
 		//Attack 1
-		if(Gdx.input.isKeyJustPressed(this.ATTACK1) && !isStunned){ //TODO: Can player attack in air? Crouching? While moving?
-			
+		if(Gdx.input.isKeyJustPressed(this.ATTACK1) && !isStunned){ 
+
 			myChain.addPress('1');
-			
+
 			if(canAttack){
 				attack1();
 				canAttack = false; 
+				canMove = false;
 				current = s;
 			}
 		}
 		if(Gdx.input.isKeyJustPressed(this.ATTACK2) && !isStunned){
-			
+
 			myChain.addPress('2');
-			
+
 			if(canAttack){
 				attack2();
 				canAttack = false;
+				canMove = false;
 				current = s2;
 			}
 		}
@@ -209,9 +216,10 @@ public class Player{ //TODO refactor/organize code so that each character should
 			if(attackCooldownTimer >= maxAttackCooldown){
 				attackCooldownTimer = 0;
 				canAttack = true;
+				canMove = true;
 			}
 		}
-		
+
 		//Stun cooldown
 		if(isStunned){
 			stunTimer += delta;
@@ -223,15 +231,17 @@ public class Player{ //TODO refactor/organize code so that each character should
 
 		limitSpeed(false, true);
 		checkKnockback(delta);
-		move();
+		if(canMove){ //Player cannot move while attacking
+			move();
+		}
 		gravity();
 		hitbox.setX(this.x);
 		hitbox.setY(this.y);		
-		
+
 		//healthBarRed = minZero( (float) ( 2 * (0.5 - getHealthPercentage() ) ));
 		//healthBarGreen = minZero( (float) (1.0 - 2 * Math.abs(0.5 - getHealthPercentage())));
 		//healthBarBlue = minZero(  (float) (2 * (getHealthPercentage() - 0.5)) );
-		
+
 		if( getHealthPercentage() == 1.0f ){
 			healthBarRed = 1.0f;
 			healthBarGreen = 1.0f;
@@ -243,7 +253,7 @@ public class Player{ //TODO refactor/organize code so that each character should
 			healthBarBlue = 0;
 		}
 	}
-	
+
 	public void damage( float amount ){//Damages this unit
 		this.health -= amount;
 	}
@@ -289,14 +299,14 @@ public class Player{ //TODO refactor/organize code so that each character should
 			if(((Projectile) other).parent == this){
 				return false;
 			}
-			else{ //Hit by opponent's attack
+			else{ //Hit by opponent's attack 
 				if(x <= other.x + other.width && x + hitbox.width >= other.x && y <= other.y + other.height && y + hitbox.height >= other.y){
-					
+
 					this.damage( ((Projectile)other).damageAmount);
-					
+
 					isKnockedBack = true;
 					knockbackTimer = maxKnockbackTime;
-					knockbackVectorX = facingLeft ? 2 : -2; //TODO knockback force may depend on the attack type
+					knockbackVectorX = facingLeft ? 2 : -2; 
 					knockbackVectorY = 0;
 					level.solids.remove(other);
 					return true;
@@ -387,6 +397,7 @@ public class Player{ //TODO refactor/organize code so that each character should
 	 */
 	public void checkKnockback(float delta){
 		if(isKnockedBack){
+			canMove = true;
 			if(knockbackTimer == maxKnockbackTime){ //so that the enemy doesn't mimic player movement, we save the initial knockback speed
 				knockbackVelX = knockbackVectorX * KNOCKBACK_FORCE;
 				knockbackVelY = knockbackVectorY * KNOCKBACK_FORCE;
@@ -406,7 +417,7 @@ public class Player{ //TODO refactor/organize code so that each character should
 	public void jump(){
 		velY = -jumpSpeed;
 	}
-	
+
 	public float minZero( float input ){
 		return( input > 0 ? input : 0 );
 	}
@@ -414,7 +425,7 @@ public class Player{ //TODO refactor/organize code so that each character should
 	public float getHealthPercentage(){
 		return(health/maxHealth);
 	}
-	
+
 	/*
 	 * Returns the current tile position of the player, given the specific tile dimensions
 	 */

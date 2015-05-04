@@ -13,7 +13,6 @@ public class RelativeProjectile extends Projectile{ //Projectiles whose position
 		super(0, 0, velX, velY, accelX, accelY, width, height, level, parent);
 		relativeX = x;
 		relativeY = y;
-		//TODO make sure this is everything we need for the constructor
 		this.type = "Projectile";
 		timer = 0.0f;
 		this.x = (float) (parent.x + parent.hitbox.width / 2.0 + relativeX);
@@ -57,7 +56,7 @@ public class RelativeProjectile extends Projectile{ //Projectiles whose position
 				if(solid.type.equals("Projectile") && this.type.equals("Projectile")){
 					Player parent = ((Projectile)this).parent;
 					Player other = ((Projectile)solid).parent;
-					
+
 					if(parent != other){ 
 						stun(parent);
 						stun(other);
@@ -67,9 +66,11 @@ public class RelativeProjectile extends Projectile{ //Projectiles whose position
 					level.solids.remove(solid);
 					break;
 				}
-				else if(solid.type.equals("Hitbox") && !this.type.equals("Projectile")){
-					while(!isColliding(solid, x + Math.signum(velX), y)){
-						x += Math.signum(velX);
+				else if(solid.type.equals("Hitbox")){
+					if(solid != parent.hitbox){
+						while(!isColliding(solid, x + Math.signum(velX), y)){
+							x += Math.signum(velX);
+						}
 					}
 				}
 			}
@@ -89,7 +90,7 @@ public class RelativeProjectile extends Projectile{ //Projectiles whose position
 				if(solid.type.equals("Projectile") && this.type.equals("Projectile")){
 					Player parent = ((Projectile)this).parent;
 					Player other = ((Projectile)solid).parent;
-					
+
 					if(parent != other){
 						stun(parent);
 						stun(other);
@@ -99,9 +100,11 @@ public class RelativeProjectile extends Projectile{ //Projectiles whose position
 					level.solids.remove(solid);
 					break;
 				}
-				else if(solid.type.equals("Hitbox") && !this.type.equals("Projectile")){
-					while(!isColliding(solid, x, y + Math.signum(velY))){
-						y += Math.signum(velY);
+				else if(solid.type.equals("Hitbox")){
+					if(solid != parent.hitbox){
+						while(!isColliding(solid, x, y + Math.signum(velY))){
+							y += Math.signum(velY);
+						}
 					}
 				}
 			}
@@ -122,6 +125,7 @@ public class RelativeProjectile extends Projectile{ //Projectiles whose position
 			p.knockbackTimer = p.maxKnockbackTime;
 			p.knockbackVectorX = p.facingLeft ? 2 : -2; 
 			p.knockbackVectorY = 0;
+			p.canMove = true;
 		}
 	}
 

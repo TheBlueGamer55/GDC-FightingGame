@@ -27,6 +27,9 @@ public class Block extends Rectangle{
 	public boolean isActive;
 	protected Gameplay level;
 	public String type;
+	
+	public boolean hasSetPlayer = false;
+	public Player player;
 
 	public Block(float x, float y, float velX, float velY, float accelX, float accelY, float width, float height, Gameplay level){
 		super(x, y, width, height);
@@ -158,6 +161,10 @@ public class Block extends Rectangle{
 			}
 		}
 		return null;
+	}
+	
+	public void setParent(Player p){
+		player = p;
 	}
 	
 }

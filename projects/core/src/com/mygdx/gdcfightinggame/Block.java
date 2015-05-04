@@ -28,7 +28,6 @@ public class Block extends Rectangle{
 	protected Gameplay level;
 	public String type;
 	
-	public boolean hasSetPlayer = false;
 	public Player player;
 
 	public Block(float x, float y, float velX, float velY, float accelX, float accelY, float width, float height, Gameplay level){

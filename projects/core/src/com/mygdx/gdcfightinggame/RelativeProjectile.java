@@ -95,6 +95,13 @@ public class RelativeProjectile extends Projectile{ //Projectiles whose position
 						stun(parent);
 						stun(other);
 					}
+					
+					if(Gameplay.random.nextBoolean()){
+						parent.clang1.play();
+					}
+					else{
+						parent.clang2.play();
+					}
 
 					level.solids.remove(this);
 					level.solids.remove(solid);

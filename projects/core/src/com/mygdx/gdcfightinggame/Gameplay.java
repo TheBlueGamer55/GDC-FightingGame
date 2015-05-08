@@ -1,6 +1,7 @@
 package com.mygdx.gdcfightinggame;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import org.mini2Dx.core.game.GameContainer;
 import org.mini2Dx.core.graphics.Graphics;
@@ -12,6 +13,7 @@ import org.mini2Dx.core.screen.transition.FadeOutTransition;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
@@ -22,6 +24,8 @@ public class Gameplay implements GameScreen{
 	public static int ID = 2;
 	public Player don, knight;
 	
+	public static Random random = new Random();
+	
 	public static int donWinCount = 0, knightWinCount = 0;
 
 	public ArrayList<Block> solids;
@@ -31,6 +35,7 @@ public class Gameplay implements GameScreen{
 	public static Sprite bgCurrent;
 
 	public Sound desertTheme;
+	public Sound roundOverSfx;
 
 	public boolean roundStarting;
 	public float roundTimer = 0;
@@ -69,6 +74,7 @@ public class Gameplay implements GameScreen{
 		bgCurrent = bgDesert;
 
 		desertTheme = Gdx.audio.newSound(Gdx.files.internal("Espana_Cani_Chiptune.mp3"));
+		roundOverSfx = Gdx.audio.newSound(Gdx.files.internal("end_round.wav"));
 	}
 
 	@Override
@@ -78,7 +84,7 @@ public class Gameplay implements GameScreen{
 	@Override
 	public void postTransitionIn(Transition t){
 		desertTheme.stop(); //make sure we aren't playing the same song multiple times at once
-		desertTheme.loop();
+		desertTheme.loop(0.25f);
 		roundStarting = true;
 	}
 
@@ -102,6 +108,11 @@ public class Gameplay implements GameScreen{
 		knight.facingLeft = true;
 		solids.add(don.hitbox);
 		solids.add(knight.hitbox);
+		
+		InputMultiplexer multiplexer = new InputMultiplexer();
+		multiplexer.addProcessor(don);
+		multiplexer.addProcessor(knight);
+		Gdx.input.setInputProcessor(multiplexer);
 	}
 
 	@Override
@@ -115,18 +126,22 @@ public class Gameplay implements GameScreen{
 		g.setColor(Color.WHITE);
 		g.drawString("P1 Wins: " + donWinCount, 16, gc.getHeight() - 36);
 		g.drawString("P2 Wins: " + knightWinCount, gc.getWidth() - 86, gc.getHeight() - 36);
-		renderSolids(g); //TODO comment out later
+		renderSolids(g); 
 		don.render(g);
 		knight.render(g);
 		if(roundStarting){
-			g.drawString("Round starting in " + (int)Math.ceil(maxRoundTimer - roundTimer), 256, 170); 
+			g.drawString("Round starting in " + (int)Math.ceil(maxRoundTimer - roundTimer), 256, 170);
+			don.facingRight = true;
+			don.facingLeft = false;
+			knight.facingLeft = true;
+			knight.facingRight = false;
 		}
 		if(roundEnding){
 			if(donWin){
-				g.drawString("Player 1 has won the round!", 226, 170); //TODO adjust coordinates
+				g.drawString("Player 1 has won the round!", 226, 170); 
 			}
 			else if(knightWin){
-				g.drawString("Player 2 has won the round!", 226, 170); //TODO adjust coordinates
+				g.drawString("Player 2 has won the round!", 226, 170); 
 			}
 		}
 	}
@@ -142,11 +157,13 @@ public class Gameplay implements GameScreen{
 				roundEnding = true;
 				knightWin = true;
 				knightWinCount++;
+				roundOverSfx.play();
 			}
 			else if(knight.health <= 0){
 				roundEnding = true;
 				donWin = true;
 				donWinCount++;
+				roundOverSfx.play();
 			}
 
 			if(Gdx.input.isKeyJustPressed(Keys.ESCAPE)){
@@ -176,7 +193,7 @@ public class Gameplay implements GameScreen{
 	}
 
 	public void renderSolids(Graphics g){
-		for(int i = 0; i < solids.size(); i++){
+		for(int i = 0; i < solids.size(); i++){ //TODO only render projectiles
 			solids.get(i).render(g);
 		}
 	}

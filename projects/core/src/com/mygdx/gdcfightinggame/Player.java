@@ -5,11 +5,13 @@ import org.mini2Dx.core.graphics.Graphics;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 
-public class Player{ 
+public class Player implements InputProcessor{ 
 
 	public float x, y;
 	public float velX, velY;
@@ -43,10 +45,10 @@ public class Player{
 	public final float frictionY = 0.4f;
 
 	public final float moveSpeed = 1.0f;
-	public final float jumpSpeed = 2.0f;
+	public final float jumpSpeed = 6.0f;
 
 	public final float maxSpeedX = 2.0f;
-	public final float maxSpeedY = 4.0f;
+	public final float maxSpeedY = 6.0f;
 
 	protected float knockbackVectorX;
 	protected float knockbackVectorY;
@@ -61,7 +63,7 @@ public class Player{
 	public float stunTimer;
 	public float maxStunTimer = 0.25f; //How long a player is stunned for
 
-	public final float maxAttackCooldown = 0.3f;
+	public final float maxAttackCooldown = 0.1f;
 	public float attackCooldownTimer;
 	public boolean canAttack = true;
 
@@ -71,15 +73,19 @@ public class Player{
 
 	public boolean facingRight, facingLeft;
 
+	public boolean movingLeft = false, movingRight = false;
+
 	public Block hitbox;
 	public Gameplay level;
 	public String type;
 	public int id;
+	
+	public Sound hurt, slash, clang1, clang2;
 
 	public ButtonChain myChain;
 
 	//Dimensions are 33x27
-	public Sprite s, s2, current;
+	public Sprite sRightHigh, sRightLow, sLeftHigh, sLeftLow, current;
 
 	//Variables that represent the controls in order to make key bindings easier - TODO: Controls different for each character
 	protected int LEFT = Keys.A;
@@ -109,16 +115,26 @@ public class Player{
 		this.ATTACK1 = attack1;
 		this.ATTACK2 = attack2; 
 
-		s = new Sprite(new Texture(Gdx.files.internal("don_right_high.png"))); //TODO temporary sprite
-		s.setOrigin(0, 0);
-		s.flip(false, true);
-		s.setScale(2);
-		s2 = new Sprite(new Texture(Gdx.files.internal("don_right_low.png")));
-		s2.setOrigin(0, 0);
-		s2.flip(false, true);
-		s2.setScale(2);
-		current = s;
-		hitbox.setSize(16 * s.getScaleX(), s.getHeight() * s.getScaleY());
+		sRightHigh = new Sprite(new Texture(Gdx.files.internal("don_right_high.png")));
+		sRightHigh.setOrigin(0, 0);
+		sRightHigh.flip(false, true);
+		sRightHigh.setScale(2);
+		sRightLow = new Sprite(new Texture(Gdx.files.internal("don_right_low.png")));
+		sRightLow.setOrigin(0, 0);
+		sRightLow.flip(false, true);
+		sRightLow.setScale(2);
+		sLeftHigh = new Sprite(new Texture(Gdx.files.internal("don_left_high.png"))); 
+		sLeftHigh.setOrigin(0, 0);
+		sLeftHigh.flip(false, true);
+		sLeftHigh.setScale(2);
+		sLeftHigh.setOrigin(sLeftHigh.getWidth(), 0);
+		sLeftLow = new Sprite(new Texture(Gdx.files.internal("don_left_low.png")));
+		sLeftLow.setOrigin(0, 0);
+		sLeftLow.flip(false, true);
+		sLeftLow.setScale(2);
+		sLeftLow.setOrigin(sLeftLow.getWidth(), 0);
+		current = sRightHigh;
+		hitbox.setSize(16 * sRightHigh.getScaleX(), sRightHigh.getHeight() * sRightHigh.getScaleY());
 
 		myChain = new ButtonChain(200.0f);
 
@@ -131,13 +147,15 @@ public class Player{
 		else if( playerID == 2){
 			healthBarX = Gdx.graphics.getWidth() - (healthBarMaxWidth + 50);
 
-			s.flip(true, false);
-			s2.flip(true, false);
-			s.setOrigin(s.getWidth(), 0);
-			s2.setOrigin(s2.getWidth(), 0);
+			current = sLeftHigh;
 			facingRight = false;
 			facingLeft = true;
 		}
+		
+		hurt = Gdx.audio.newSound(Gdx.files.internal("hurt.wav"));
+		slash = Gdx.audio.newSound(Gdx.files.internal("slash.mp3"));
+		clang1 = Gdx.audio.newSound(Gdx.files.internal("clang_strong.mp3"));
+		clang2 = Gdx.audio.newSound(Gdx.files.internal("clang_stronger.mp3"));
 	}
 
 	public void render(Graphics g){
@@ -149,6 +167,7 @@ public class Player{
 
 		g.setColor(Color.WHITE);
 		g.drawSprite(current, x, y);
+		g.drawString(id + "", x + current.getWidth() / 2, y - 16);
 	}
 
 	public void update(float delta){
@@ -161,7 +180,7 @@ public class Player{
 
 		accelX = 0; //keep resetting the x acceleration
 
-		//Move Left
+		/*//Move Left
 		if(Gdx.input.isKeyPressed(this.LEFT) && velX > -maxSpeedX){
 			myChain.addPress('L');
 			accelX = -moveSpeed;
@@ -170,41 +189,18 @@ public class Player{
 		if(Gdx.input.isKeyPressed(this.RIGHT) && velX < maxSpeedX){
 			myChain.addPress('R');
 			accelX = moveSpeed;
+		}*/
+		//Move Left
+		if(movingLeft && velX > -maxSpeedX){
+			myChain.addPress('L');
+			accelX = -moveSpeed;
 		}
-		//Jump
-		if(Gdx.input.isKeyJustPressed(this.JUMP) ){
-
-			myChain.addPress('J');
-
-			if(onGround){
-				jump();
-			}
-
+		//Move Right
+		if(movingRight && velX < maxSpeedX){
+			myChain.addPress('R');
+			accelX = moveSpeed;
 		}
-		
-		//Attack 1
-		if(Gdx.input.isKeyJustPressed(this.ATTACK1) && !isStunned){ 
 
-			myChain.addPress('1');
-
-			if(canAttack){
-				attack1();
-				canAttack = false; 
-				canMove = false;
-				current = s;
-			}
-		}
-		if(Gdx.input.isKeyJustPressed(this.ATTACK2) && !isStunned){
-
-			myChain.addPress('2');
-
-			if(canAttack){
-				attack2();
-				canAttack = false;
-				canMove = false;
-				current = s2;
-			}
-		}
 		//Apply friction when not moving or when exceeding the max horizontal speed
 		if(Math.abs(velX) > maxSpeedX || !Gdx.input.isKeyPressed(this.LEFT) && !Gdx.input.isKeyPressed(this.RIGHT)){
 			friction(true, false);
@@ -226,6 +222,40 @@ public class Player{
 			if(stunTimer >= maxStunTimer){
 				stunTimer = 0;
 				isStunned = false;
+			}
+		}
+
+		//Always face the opponent
+		if(this == level.don){ //For player one
+			if(this.x <= level.knight.x){ //If to the left of the opponent
+				facingRight = true;
+				facingLeft = false;
+				if(!(current == sRightHigh || current == sRightLow)){ //If switching directions
+					current = sRightHigh;
+				}
+			}
+			else{
+				facingRight = false;
+				facingLeft = true;
+				if(!(current == sLeftHigh || current == sLeftLow)){ //If switching directions
+					current = sLeftHigh;
+				}
+			}
+		}
+		else if(this == level.knight){ //For player 2
+			if(this.x <= level.don.x){ //If to the left of the opponent
+				facingRight = true;
+				facingLeft = false;
+				if(!(current == sRightHigh || current == sRightLow)){ //If switching directions
+					current = sRightHigh;
+				}
+			}
+			else{
+				facingRight = false;
+				facingLeft = true;
+				if(!(current == sLeftHigh || current == sLeftLow)){ //If switching directions
+					current = sLeftHigh;
+				}
 			}
 		}
 
@@ -256,14 +286,15 @@ public class Player{
 
 	public void damage( float amount ){//Damages this unit
 		this.health -= amount;
+		hurt.play();
 	}
 
 	/*
 	 * High attack - should be overridden for each character
-	 * TODO: finish code for one attack type and translate it onto the second attack type
 	 * should specific movement be handled by the Player or Projectile class
 	 */
 	public void attack1(){
+		slash.play();
 		if(facingRight){
 			RelativeProjectile projectile = new RelativeProjectile(0, -5, 2, 0, 0, 0, 12, 4, this.level, this);
 			level.solids.add(projectile);
@@ -278,6 +309,7 @@ public class Player{
 	 * Low attack - should be overridden for each character
 	 */
 	public void attack2(){
+		slash.play();
 		if(facingRight){
 			RelativeProjectile projectile = new RelativeProjectile(0, 5, 2, 0, 0, 0, 12, 4, this.level, this);
 			level.solids.add(projectile);
@@ -496,6 +528,105 @@ public class Player{
 			s[i].setOrigin(0, 0);
 			s[i].flip(false, true);
 		}
+	}
+
+	/*
+	 * ===============================================Input Methods==================================================
+	 */
+
+	@Override
+	public boolean keyDown(int keycode) {
+		if(keycode == this.JUMP){
+			myChain.addPress('J');
+			if(onGround){
+				jump();
+			}
+		}
+		//Move Left
+		if(keycode == this.LEFT && velX > -maxSpeedX){
+			myChain.addPress('L');
+			movingLeft = true;
+		}
+		//Move Right
+		else if(keycode == this.RIGHT && velX < maxSpeedX){
+			myChain.addPress('R');
+			movingRight = true;
+		}
+		//Attack 1
+		if(keycode == this.ATTACK1 && !isStunned && onGround){ 
+
+			myChain.addPress('1');
+
+			if(canAttack){
+				attack1();
+				canAttack = false; 
+				canMove = false;
+				if(facingRight){
+					current = sRightHigh;
+				}
+				else{
+					current = sLeftHigh;
+				}
+			}
+		}
+		if(keycode == this.ATTACK2 && !isStunned && onGround){
+
+			myChain.addPress('2');
+
+			if(canAttack){
+				attack2();
+				canAttack = false;
+				canMove = false;
+				if(facingRight){
+					current = sRightLow;
+				}
+				else{
+					current = sLeftLow;
+				}
+			}
+		}
+		return false;
+	}
+
+	@Override
+	public boolean keyUp(int keycode) {
+		if(keycode == this.LEFT){
+			movingLeft = false;
+		}
+		if(keycode == this.RIGHT){
+			movingRight = false;
+		}
+		return false;
+	}
+
+	@Override
+	public boolean keyTyped(char character) {
+		return false;
+	}
+
+	@Override
+	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+		return false;
+	}
+
+	@Override
+	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+		return false;
+	}
+
+	@Override
+	public boolean touchDragged(int screenX, int screenY, int pointer) {
+		return false;
+	}
+
+	@Override
+	public boolean mouseMoved(int screenX, int screenY) {
+		return false;
+	}
+
+	@Override
+	public boolean scrolled(int amount) {
+		return false;
 	}
 
 }

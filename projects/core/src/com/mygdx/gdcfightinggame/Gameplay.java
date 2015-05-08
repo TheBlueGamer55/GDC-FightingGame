@@ -13,7 +13,6 @@ import org.mini2Dx.core.screen.transition.FadeOutTransition;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
@@ -108,11 +107,6 @@ public class Gameplay implements GameScreen{
 		knight.facingLeft = true;
 		solids.add(don.hitbox);
 		solids.add(knight.hitbox);
-		
-		InputMultiplexer multiplexer = new InputMultiplexer();
-		multiplexer.addProcessor(don);
-		multiplexer.addProcessor(knight);
-		Gdx.input.setInputProcessor(multiplexer);
 	}
 
 	@Override

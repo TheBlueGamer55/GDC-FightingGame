@@ -105,7 +105,6 @@ public class MainMenu implements GameScreen, InputProcessor{
 		startSelect = true;
 		readyToStart = false;
 		currentMenu = mainMenu;
-		Gdx.input.setInputProcessor(this);
 	}
 
 	@Override

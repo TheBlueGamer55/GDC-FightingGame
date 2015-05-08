@@ -5,13 +5,12 @@ import org.mini2Dx.core.graphics.Graphics;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 
-public class Player implements InputProcessor{ 
+public class Player{ 
 
 	public float x, y;
 	public float velX, velY;
@@ -22,7 +21,7 @@ public class Player implements InputProcessor{
 	//***********************************************************************
 	//HEALTHBAR STUFF
 
-	public float maxHealth = 100.0f;
+	public float maxHealth = 100.0f; 
 	public float health = maxHealth;
 
 	public float healthBarMaxWidth = 200;
@@ -44,7 +43,7 @@ public class Player implements InputProcessor{
 	public final float frictionX = 0.4f;
 	public final float frictionY = 0.4f;
 
-	public final float moveSpeed = 1.0f;
+	public final float moveSpeed = 2.0f;
 	public final float jumpSpeed = 6.0f;
 
 	public final float maxSpeedX = 2.0f;
@@ -73,13 +72,11 @@ public class Player implements InputProcessor{
 
 	public boolean facingRight, facingLeft;
 
-	public boolean movingLeft = false, movingRight = false;
-
 	public Block hitbox;
 	public Gameplay level;
 	public String type;
 	public int id;
-	
+
 	public Sound hurt, slash, clang1, clang2;
 
 	public ButtonChain myChain;
@@ -151,7 +148,7 @@ public class Player implements InputProcessor{
 			facingRight = false;
 			facingLeft = true;
 		}
-		
+
 		hurt = Gdx.audio.newSound(Gdx.files.internal("hurt.wav"));
 		slash = Gdx.audio.newSound(Gdx.files.internal("slash.mp3"));
 		clang1 = Gdx.audio.newSound(Gdx.files.internal("clang_strong.mp3"));
@@ -180,25 +177,56 @@ public class Player implements InputProcessor{
 
 		accelX = 0; //keep resetting the x acceleration
 
-		/*//Move Left
-		if(Gdx.input.isKeyPressed(this.LEFT) && velX > -maxSpeedX){
-			myChain.addPress('L');
-			accelX = -moveSpeed;
-		}
-		//Move Right
-		if(Gdx.input.isKeyPressed(this.RIGHT) && velX < maxSpeedX){
-			myChain.addPress('R');
-			accelX = moveSpeed;
-		}*/
 		//Move Left
-		if(movingLeft && velX > -maxSpeedX){
+		if(Gdx.input.isKeyJustPressed(JUMP)){
+			myChain.addPress('J');
+			if(onGround){
+				jump();
+			}
+		}
+		//Move Left
+		if(Gdx.input.isKeyPressed(LEFT) && velX > -maxSpeedX){
 			myChain.addPress('L');
 			accelX = -moveSpeed;
 		}
 		//Move Right
-		if(movingRight && velX < maxSpeedX){
+		if(Gdx.input.isKeyPressed(RIGHT) && velX < maxSpeedX){
 			myChain.addPress('R');
 			accelX = moveSpeed;
+		}
+
+		//Attack 1
+		if(Gdx.input.isKeyJustPressed(ATTACK1) && !isStunned && onGround){ 
+
+			myChain.addPress('1');
+
+			if(canAttack){
+				attack1();
+				canAttack = false; 
+				canMove = false;
+				if(facingRight){
+					current = sRightHigh;
+				}
+				else{
+					current = sLeftHigh;
+				}
+			}
+		}
+		if(Gdx.input.isKeyJustPressed(ATTACK2) && !isStunned && onGround){
+
+			myChain.addPress('2');
+
+			if(canAttack){
+				attack2();
+				canAttack = false;
+				canMove = false;
+				if(facingRight){
+					current = sRightLow;
+				}
+				else{
+					current = sLeftLow;
+				}
+			}
 		}
 
 		//Apply friction when not moving or when exceeding the max horizontal speed
@@ -324,29 +352,26 @@ public class Player implements InputProcessor{
 	 * Checks if there is a collision if the player was at the given position.
 	 */
 	public boolean isColliding(Block other, float x, float y){
-		if(other == this.hitbox){ //Make sure solid isn't stuck on itself
-			return false;
-		}
-		if(other.type.equals("Projectile")){ //Make sure a character isn't hit by its own attacks
-			if(((Projectile) other).parent == this){
-				return false;
-			}
-			else{ //Hit by opponent's attack 
-				if(x <= other.x + other.width && x + hitbox.width >= other.x && y <= other.y + other.height && y + hitbox.height >= other.y){
+		if(other != this.hitbox){
+			if(other.type.equals("Projectile")){ 
+				//Hit by opponent's attack 
+				if(((Projectile) other).parent != this){ 
+					if(x <= other.x + other.width && x + hitbox.width >= other.x && y <= other.y + other.height && y + hitbox.height >= other.y){
 
-					this.damage( ((Projectile)other).damageAmount);
+						this.damage( ((Projectile)other).damageAmount);
 
-					isKnockedBack = true;
-					knockbackTimer = maxKnockbackTime;
-					knockbackVectorX = facingLeft ? 2 : -2; 
-					knockbackVectorY = 0;
-					level.solids.remove(other);
-					return true;
+						isKnockedBack = true;
+						knockbackTimer = maxKnockbackTime;
+						knockbackVectorX = facingLeft ? 2 : -2; 
+						knockbackVectorY = 0;
+						level.solids.remove(other);
+						return true;
+					}
 				}
 			}
-		}
-		if(x < other.x + other.width && x + hitbox.width > other.x && y < other.y + other.height && y + hitbox.height > other.y){
-			return true;
+			if(x < other.x + other.width && x + hitbox.width > other.x && y < other.y + other.height && y + hitbox.height > other.y){
+				return true;
+			}
 		}
 		return false;
 	}
@@ -491,7 +516,14 @@ public class Player implements InputProcessor{
 		for(int i = 0; i < level.solids.size(); i++){
 			Block solid = level.solids.get(i);
 			if(isColliding(solid, x + velX, y)){
-				while(!isColliding(solid, x + Math.signum(velX), y)){
+				double dist = Math.abs(solid.x - this.x);
+				/*
+				 * NOTE: For some reason, when timed correctly, if the player taps twice, the player's own 
+				 * x coordinate jumps ahead really far, which causes the isColliding() method to return false,
+				 * which in turn causes an infinite loop. Limiting this with a for loop  and dist is only a 
+				 * hard-coded solution. The problem is most likely with the knockback and collision code.
+				 */
+				for(int n = 1; n <= dist && !isColliding(solid, x + Math.signum(velX), y) && Math.signum(velX) != 0; n++){
 					x += Math.signum(velX);
 				}
 				velX = 0;
@@ -509,7 +541,8 @@ public class Player implements InputProcessor{
 		for(int i = 0; i < level.solids.size(); i++){
 			Block solid = level.solids.get(i);
 			if(isColliding(solid, x, y + velY)){
-				while(!isColliding(solid, x, y + Math.signum(velY))){
+				double dist = Math.abs(solid.y - this.y);
+				for(int n = 1; n <= dist && !isColliding(solid, x, y + Math.signum(velY)) && Math.signum(velY) != 0; n++){
 					y += Math.signum(velY);
 				}
 				velY = 0;
@@ -528,105 +561,6 @@ public class Player implements InputProcessor{
 			s[i].setOrigin(0, 0);
 			s[i].flip(false, true);
 		}
-	}
-
-	/*
-	 * ===============================================Input Methods==================================================
-	 */
-
-	@Override
-	public boolean keyDown(int keycode) {
-		if(keycode == this.JUMP){
-			myChain.addPress('J');
-			if(onGround){
-				jump();
-			}
-		}
-		//Move Left
-		if(keycode == this.LEFT && velX > -maxSpeedX){
-			myChain.addPress('L');
-			movingLeft = true;
-		}
-		//Move Right
-		else if(keycode == this.RIGHT && velX < maxSpeedX){
-			myChain.addPress('R');
-			movingRight = true;
-		}
-		//Attack 1
-		if(keycode == this.ATTACK1 && !isStunned && onGround){ 
-
-			myChain.addPress('1');
-
-			if(canAttack){
-				attack1();
-				canAttack = false; 
-				canMove = false;
-				if(facingRight){
-					current = sRightHigh;
-				}
-				else{
-					current = sLeftHigh;
-				}
-			}
-		}
-		if(keycode == this.ATTACK2 && !isStunned && onGround){
-
-			myChain.addPress('2');
-
-			if(canAttack){
-				attack2();
-				canAttack = false;
-				canMove = false;
-				if(facingRight){
-					current = sRightLow;
-				}
-				else{
-					current = sLeftLow;
-				}
-			}
-		}
-		return false;
-	}
-
-	@Override
-	public boolean keyUp(int keycode) {
-		if(keycode == this.LEFT){
-			movingLeft = false;
-		}
-		if(keycode == this.RIGHT){
-			movingRight = false;
-		}
-		return false;
-	}
-
-	@Override
-	public boolean keyTyped(char character) {
-		return false;
-	}
-
-	@Override
-	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-		return false;
-	}
-
-	@Override
-	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-		return false;
-	}
-
-	@Override
-	public boolean touchDragged(int screenX, int screenY, int pointer) {
-		return false;
-	}
-
-	@Override
-	public boolean mouseMoved(int screenX, int screenY) {
-		return false;
-	}
-
-	@Override
-	public boolean scrolled(int amount) {
-		return false;
 	}
 
 }

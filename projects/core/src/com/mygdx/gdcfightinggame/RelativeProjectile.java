@@ -68,7 +68,8 @@ public class RelativeProjectile extends Projectile{ //Projectiles whose position
 				}
 				else if(solid.type.equals("Hitbox")){
 					if(solid != parent.hitbox){
-						while(!isColliding(solid, x + Math.signum(velX), y)){
+						double dist = Math.abs(solid.x - this.x);
+						for(int n = 1; n <= dist && !isColliding(solid, x + Math.signum(velX), y) && Math.signum(velX) != 0; n++){
 							x += Math.signum(velX);
 						}
 					}
@@ -109,7 +110,8 @@ public class RelativeProjectile extends Projectile{ //Projectiles whose position
 				}
 				else if(solid.type.equals("Hitbox")){
 					if(solid != parent.hitbox){
-						while(!isColliding(solid, x, y + Math.signum(velY))){
+						double dist = Math.abs(solid.y - this.y);
+						for(int n = 1; n <= dist && !isColliding(solid, x, y + Math.signum(velY)) && Math.signum(velY) != 0; n++){
 							y += Math.signum(velY);
 						}
 					}
@@ -123,7 +125,6 @@ public class RelativeProjectile extends Projectile{ //Projectiles whose position
 
 	/*
 	 * Applies a stun and knockback to a player
-	 * TODO adjust stun until it works properly
 	 */
 	public void stun(Player p){
 		if(!p.isStunned && !p.isKnockedBack){

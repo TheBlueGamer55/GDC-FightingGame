@@ -13,7 +13,7 @@ import org.mini2Dx.core.graphics.Graphics;
 public class Block extends Rectangle{
 
 	private static final long serialVersionUID = 1L;
-	
+
 	public float velX, velY;
 	public float accelX, accelY;
 
@@ -27,7 +27,7 @@ public class Block extends Rectangle{
 	public boolean isActive;
 	protected Gameplay level;
 	public String type;
-	
+
 	public Player player;
 
 	public Block(float x, float y, float velX, float velY, float accelX, float accelY, float width, float height, Gameplay level){
@@ -72,7 +72,8 @@ public class Block extends Rectangle{
 					break;
 				}
 				else if(solid.type.equals("Hitbox") && !this.type.equals("Projectile")){
-					while(!isColliding(solid, x + Math.signum(velX), y)){
+					double dist = Math.abs(solid.x - this.x);
+					for(int n = 1; n <= dist && !isColliding(solid, x + Math.signum(velX), y) && Math.signum(velX) != 0; n++){
 						x += Math.signum(velX);
 					}
 				}
@@ -95,7 +96,8 @@ public class Block extends Rectangle{
 					break;
 				}
 				else if(solid.type.equals("Hitbox") && !this.type.equals("Projectile")){
-					while(!isColliding(solid, x, y + Math.signum(velY))){
+					double dist = Math.abs(solid.y - this.y);
+					for(int n = 1; n <= dist && !isColliding(solid, x, y + Math.signum(velY)) && Math.signum(velY) != 0; n++){
 						y += Math.signum(velY);
 					}
 				}
@@ -127,11 +129,10 @@ public class Block extends Rectangle{
 	 * Checks if there is a collision if the block was at the given position.
 	 */
 	public boolean isColliding(Block other, float x, float y){
-		if(other == this){ //Make sure this block isn't stuck on itself
-			return false;
-		}
-		if(x < other.x + other.width && x + width > other.x && y < other.y + other.height && y + height > other.y){
-			return true;
+		if(other != this){
+			if(x < other.x + other.width && x + width > other.x && y < other.y + other.height && y + height > other.y){
+				return true;
+			}
 		}
 		return false;
 	}
@@ -148,7 +149,7 @@ public class Block extends Rectangle{
 		}
 		return false;
 	}
-	
+
 	/*
 	 * Helper method that returns a block that is colliding with this block
 	 */
@@ -161,9 +162,9 @@ public class Block extends Rectangle{
 		}
 		return null;
 	}
-	
+
 	public void setParent(Player p){
 		player = p;
 	}
-	
+
 }

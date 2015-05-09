@@ -77,7 +77,7 @@ public class Player{
 	public String type;
 	public int id;
 
-	public Sound hurt, slash, clang1, clang2;
+	public Sound hurt, slash, clang1, clang2, clang3;
 
 	public ButtonChain myChain;
 
@@ -153,6 +153,7 @@ public class Player{
 		slash = Gdx.audio.newSound(Gdx.files.internal("slash.mp3"));
 		clang1 = Gdx.audio.newSound(Gdx.files.internal("clang_strong.mp3"));
 		clang2 = Gdx.audio.newSound(Gdx.files.internal("clang_stronger.mp3"));
+		clang3 = Gdx.audio.newSound(Gdx.files.internal("clang_long.mp3"));
 	}
 
 	public void render(Graphics g){

@@ -97,11 +97,15 @@ public class RelativeProjectile extends Projectile{ //Projectiles whose position
 						stun(other);
 					}
 					
-					if(Gameplay.random.nextBoolean()){
+					int clangTemp = Gameplay.random.nextInt(8) + 1;
+					if(clangTemp <= 4){
 						parent.clang1.play();
 					}
-					else{
+					else if(clangTemp >= 5 && clangTemp <= 6){
 						parent.clang2.play();
+					}
+					else{
+						parent.clang3.play();
 					}
 
 					level.solids.remove(this);

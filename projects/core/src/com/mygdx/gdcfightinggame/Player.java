@@ -84,7 +84,7 @@ public class Player{
 	//Dimensions are 33x27
 	public Sprite sRightHigh, sRightLow, sLeftHigh, sLeftLow, current;
 
-	//Variables that represent the controls in order to make key bindings easier - TODO: Controls different for each character
+	//Variables that represent the controls in order to make key bindings easier
 	protected int LEFT = Keys.A;
 	protected int RIGHT = Keys.D;
 	protected int JUMP = Keys.W;

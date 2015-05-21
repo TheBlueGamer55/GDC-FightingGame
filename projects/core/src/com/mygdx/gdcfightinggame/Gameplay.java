@@ -187,8 +187,10 @@ public class Gameplay implements GameScreen{
 	}
 
 	public void renderSolids(Graphics g){
-		for(int i = 0; i < solids.size(); i++){ //TODO only render projectiles
-			solids.get(i).render(g);
+		for(int i = 0; i < solids.size(); i++){ 
+			if(solids.get(i).type.equals("Projectile")){
+				solids.get(i).render(g);
+			}
 		}
 	}
 
